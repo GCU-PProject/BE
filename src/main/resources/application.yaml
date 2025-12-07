@@ -1,3 +1,16 @@
 spring:
   application:
     name: Glaw
+  profiles:
+    active: local, jwt, oauth
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
