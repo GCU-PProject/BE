@@ -42,23 +42,24 @@ public class JwtProvider {
 	}
 
 	// 1. Access Token 생성
-	public String createAccessToken(Long userId, String email) {
-		return createToken(userId, email, accessTokenExpiration);
+	public String createAccessToken(Long userId, String email, String name) {
+		return createToken(userId, email, name, accessTokenExpiration);
 	}
 
 	// 2. Refresh Token 생성
-	public String createRefreshToken(Long userId, String email) {
-		return createToken(userId, email, refreshTokenExpiration);
+	public String createRefreshToken(Long userId, String email, String name) {
+		return createToken(userId, email, name, refreshTokenExpiration);
 	}
 
 	// 3. JWT 생성
-	private String createToken(Long userId, String email, long expireTimeMs) {
+	private String createToken(Long userId, String email, String name, long expireTimeMs) {
 		Date now = new Date();
 		Date expiry = new Date(now.getTime() + expireTimeMs);
 
 		return Jwts.builder()
 			.setSubject(String.valueOf(userId))
 			.claim("email", email)
+			.claim("name", name)
 			.setIssuedAt(now)
 			.setExpiration(expiry)
 			.signWith(key, SignatureAlgorithm.HS256)
@@ -93,7 +94,7 @@ public class JwtProvider {
 	}
 
 	// 6. JWT에서 userId 꺼내기
-	public Long getUserId(String token) {
+	public Long getUserIdFromToken(String token) {
 		Claims claims = getAllClaims(token);
 		return Long.valueOf(claims.getSubject());
 	}
@@ -102,6 +103,12 @@ public class JwtProvider {
 	public String getEmailFromToken(String token) {
 		Claims claims = getAllClaims(token);
 		return claims.get("email", String.class);
+	}
+
+	// 8. JWT에서 name 꺼내기
+	public String getNameFromToken(String token) {
+		Claims claims = getAllClaims(token);
+		return claims.get("name", String.class);
 	}
 
 	private Claims getAllClaims(String token) {

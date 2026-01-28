@@ -32,12 +32,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 		Long userId = oAuth2User.getUserId();
 		String email = oAuth2User.getEmail();
+		String name = oAuth2User.getName();
 
 		log.info("Login Success, userId={}, email={}", userId, email);
 
 		// 2) AccessToken, RefreshToken 생성
-		String accessToken = jwtProvider.createAccessToken(userId, email);
-		String refreshToken = jwtProvider.createRefreshToken(userId, email);
+		String accessToken = jwtProvider.createAccessToken(userId, email, name);
+		String refreshToken = jwtProvider.createRefreshToken(userId, email, name);
 
 		// 3) RefreshToken 저장
 		jwtProvider.storeRefreshToken(userId, refreshToken);
