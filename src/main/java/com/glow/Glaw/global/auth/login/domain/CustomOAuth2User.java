@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import lombok.Getter;
 
+// entity를 SecurityContext에 저장할 포맷 만들기
 @Getter
 public class CustomOAuth2User implements OAuth2User {
 	private final Long userId;

@@ -6,6 +6,7 @@ import com.glow.Glaw.domain.user.domain.User;
 import com.glow.Glaw.global.auth.login.userInfo.GoogleOAuth2UserInfo;
 import com.glow.Glaw.global.auth.login.userInfo.OAuth2UserInfo;
 
+// 받아온 정보를 User entity로 변환
 public class OAuthAttributes {
 	private final OAuth2UserInfo oAuth2UserInfo;
 
