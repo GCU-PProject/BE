@@ -2,6 +2,7 @@ package com.glow.Glaw.global.auth.jwt;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -117,5 +120,31 @@ public class JwtProvider {
 			.build()
 			.parseClaimsJws(token)
 			.getBody();
+	}
+
+	// 9. 쿠키에서 accessToken 추출
+	public Optional<String> extractAccessCookie(HttpServletRequest request) {
+		if (request.getCookies() != null) return Optional.empty();
+
+		for (Cookie cookie : request.getCookies()) {
+			if (cookie.getName().equals("access-token")) {
+				return Optional.of(cookie.getValue());
+			}
+		}
+
+		return Optional.empty();
+	}
+
+	// 10. 쿠키에서 refreshToken 추출
+	public Optional<String> extractRefreshCookie(HttpServletRequest request) {
+		if (request.getCookies() == null) return Optional.empty();
+
+		for (Cookie cookie : request.getCookies()) {
+			if (cookie.getName().equals("refresh-token")) {
+				return Optional.of(cookie.getValue());
+			}
+		}
+
+		return Optional.empty();
 	}
 }

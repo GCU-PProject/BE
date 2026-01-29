@@ -1,0 +1,92 @@
+package com.glow.Glaw.global.auth.login.controller;
+
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.glow.Glaw.domain.user.domain.User;
+import com.glow.Glaw.domain.user.domain.repository.UserRepository;
+import com.glow.Glaw.global.auth.jwt.JwtProvider;
+import com.glow.Glaw.global.auth.login.service.RefreshTokenService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+	private final JwtProvider jwtProvider;
+	private final UserRepository userRepository;
+	private final RefreshTokenService refreshTokenService;
+
+	// 1. AccessToken 재발급 (RefreshToken으로 AccessToken 발급)
+	@PostMapping("/reissue")
+	public ResponseEntity<?> reissue(HttpServletRequest request) {
+		// 1) RefreshToken 쿠키에서 꺼내기
+		String refreshToken = jwtProvider.extractRefreshCookie(request)
+			.orElseThrow(() -> new RuntimeException("Refresh Token Not Found"));
+
+		// 2) RefreshToken 유효성 검사
+		if (!jwtProvider.validateToken(refreshToken)) {
+			throw new RuntimeException("Invalid Refresh Token");
+		}
+
+		// 3) refreshToken에서 email / userId 파싱
+		Long userId = jwtProvider.getUserIdFromToken(refreshToken);
+		String email = jwtProvider.getEmailFromToken(refreshToken);
+		String name = jwtProvider.getNameFromToken(refreshToken);
+
+		// 4) 유저 존재 여부 확인
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new RuntimeException("User Not Found"));
+
+		// 5) Redis에 저장된 RefreshToken과 일치하는지 확인
+		refreshTokenService.validateStoredRefreshToken(user.getId(), refreshToken);
+
+		// 6) 새 AccessToken 발급
+		String newAccessToken = jwtProvider.createAccessToken(userId, email, name);
+
+		log.info("New Access Token: {}", newAccessToken);
+
+		// 7) 프론트에 반환
+		return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+	}
+
+	// 2. 로그아웃 (RefreshToken 삭제 + 쿠키 만료)
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+		// 1) 쿠키에서 refreshToken 꺼내기
+		String refreshToken = jwtProvider.extractRefreshCookie(request).orElse(null);
+
+		if (refreshToken != null) {
+			// 2) refreshToken에서 userId 파싱
+			Long userId = jwtProvider.getUserIdFromToken(refreshToken);
+
+			// 3) Redis에서 RefreshToken 삭제
+			refreshTokenService.deleteRefreshToken(userId);
+		}
+
+		expireCookie(response, "refreshToken");
+
+		log.info("로그아웃 완료");
+
+		return ResponseEntity.ok(Map.of("message", "로그아웃 완료"));
+	}
+
+	// 쿠키 삭제
+	private void expireCookie(HttpServletResponse response, String name) {
+		Cookie cookie = new Cookie(name, null);
+		cookie.setPath("/");
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0);
+		response.addCookie(cookie);
+	}
+}
