@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.glow.Glaw.domain.shared.Role;
 import com.glow.Glaw.domain.user.domain.User;
-import com.glow.Glaw.domain.user.domain.repository.UserRepository;
+import com.glow.Glaw.domain.user.repository.UserRepository;
 import com.glow.Glaw.global.auth.jwt.JwtProvider;
 import com.glow.Glaw.global.auth.login.service.RefreshTokenService;
 

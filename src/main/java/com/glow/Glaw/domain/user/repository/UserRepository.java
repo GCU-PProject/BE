@@ -1,4 +1,4 @@
-package com.glow.Glaw.domain.user.domain.repository;
+package com.glow.Glaw.domain.user.repository;
 
 import java.util.Optional;
 
