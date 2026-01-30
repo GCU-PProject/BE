@@ -1,9 +1,11 @@
 package com.glow.Glaw.global.auth.login.domain;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.glow.Glaw.domain.shared.Role;
@@ -32,10 +34,10 @@ public class CustomOAuth2User implements OAuth2User {
 		return attributes;
 	}
 
-	// role 관련 (권한 기능 사용하지 않지만 OAuth2User 인터페이스에서 필요로 함) -> 권한 없으므로 null로 반환
+	// Security 권한 검사를 위한 Role 반환
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+		return List.of(new SimpleGrantedAuthority(role.name()));
 	}
 
 	// 주요 식별 키 (userId)
