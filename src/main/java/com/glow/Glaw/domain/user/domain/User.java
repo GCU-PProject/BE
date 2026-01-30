@@ -49,4 +49,8 @@ public class User extends BaseTimeEntity {
 			.name(name)
 			.build();
 	}
+
+	public void changeRole(Role role) {
+		this.role = role;
+	}
 }

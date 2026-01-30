@@ -48,16 +48,16 @@ public class JwtProvider {
 
 	// 1. Access Token 생성
 	public String createAccessToken(Long userId, String email, String name, Role role) {
-		return createToken(userId, email, name, accessTokenExpiration);
+		return createToken(userId, email, name, role, accessTokenExpiration);
 	}
 
 	// 2. Refresh Token 생성
 	public String createRefreshToken(Long userId, String email, String name, Role role) {
-		return createToken(userId, email, name, refreshTokenExpiration);
+		return createToken(userId, email, name, role, refreshTokenExpiration);
 	}
 
 	// 3. JWT 생성
-	private String createToken(Long userId, String email, String name, long expireTimeMs) {
+	private String createToken(Long userId, String email, String name, Role role, long expireTimeMs) {
 		Date now = new Date();
 		Date expiry = new Date(now.getTime() + expireTimeMs);
 
@@ -65,6 +65,7 @@ public class JwtProvider {
 			.setSubject(String.valueOf(userId))
 			.claim("email", email)
 			.claim("name", name)
+			.claim("role", role)
 			.setIssuedAt(now)
 			.setExpiration(expiry)
 			.signWith(key, SignatureAlgorithm.HS256)
