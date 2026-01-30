@@ -8,6 +8,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.glow.Glaw.domain.shared.Role;
 import com.glow.Glaw.global.auth.login.domain.CustomOAuth2User;
 
 import jakarta.servlet.FilterChain;
@@ -51,12 +52,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		Long userId = jwtProvider.getUserIdFromToken(token);
 		String email = jwtProvider.getEmailFromToken(token);
 		String name = jwtProvider.getNameFromToken(token);
+		Role role = jwtProvider.getRoleFromToken(token);
 
 		// SecurityContext에 넣을 CustomOAuth2User 생성
 		CustomOAuth2User customUser = new CustomOAuth2User(
 			userId,
 			email,
 			name,
+			role,
 			null
 		);
 

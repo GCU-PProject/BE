@@ -34,12 +34,16 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/oauth2/**",
-					"/api/auth/**"
-				).permitAll()
-				.requestMatchers(
+					"/api/auth/login",
 					"/swagger-ui/**",
 					"/v3/api-docs/**"
 				).permitAll()
+				// 최초 로그인
+				.requestMatchers("/api/auth/onboarding")
+				.hasAuthority("ROLE_GUEST")
+				// 서비스 API (온보딩 완료자만)
+				.requestMatchers("/api/**")
+				.hasAuthority("ROLE_USER")
 				.anyRequest().authenticated()
 			)
 

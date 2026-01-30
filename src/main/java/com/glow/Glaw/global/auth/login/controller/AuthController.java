@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.glow.Glaw.domain.shared.Role;
 import com.glow.Glaw.domain.user.domain.User;
-import com.glow.Glaw.domain.user.domain.repository.UserRepository;
+import com.glow.Glaw.domain.user.repository.UserRepository;
 import com.glow.Glaw.global.auth.jwt.JwtProvider;
 import com.glow.Glaw.global.auth.login.service.RefreshTokenService;
 
@@ -43,6 +44,7 @@ public class AuthController {
 		Long userId = jwtProvider.getUserIdFromToken(refreshToken);
 		String email = jwtProvider.getEmailFromToken(refreshToken);
 		String name = jwtProvider.getNameFromToken(refreshToken);
+		Role role = jwtProvider.getRoleFromToken(refreshToken);
 
 		// 4) 유저 존재 여부 확인
 		User user = userRepository.findByEmail(email)
@@ -52,7 +54,7 @@ public class AuthController {
 		refreshTokenService.validateStoredRefreshToken(user.getId(), refreshToken);
 
 		// 6) 새 AccessToken 발급
-		String newAccessToken = jwtProvider.createAccessToken(userId, email, name);
+		String newAccessToken = jwtProvider.createAccessToken(userId, email, name, role);
 
 		log.info("New Access Token: {}", newAccessToken);
 

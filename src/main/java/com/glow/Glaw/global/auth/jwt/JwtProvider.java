@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.glow.Glaw.domain.shared.Role;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -45,17 +47,17 @@ public class JwtProvider {
 	}
 
 	// 1. Access Token 생성
-	public String createAccessToken(Long userId, String email, String name) {
-		return createToken(userId, email, name, accessTokenExpiration);
+	public String createAccessToken(Long userId, String email, String name, Role role) {
+		return createToken(userId, email, name, role, accessTokenExpiration);
 	}
 
 	// 2. Refresh Token 생성
-	public String createRefreshToken(Long userId, String email, String name) {
-		return createToken(userId, email, name, refreshTokenExpiration);
+	public String createRefreshToken(Long userId, String email, String name, Role role) {
+		return createToken(userId, email, name, role, refreshTokenExpiration);
 	}
 
 	// 3. JWT 생성
-	private String createToken(Long userId, String email, String name, long expireTimeMs) {
+	private String createToken(Long userId, String email, String name, Role role, long expireTimeMs) {
 		Date now = new Date();
 		Date expiry = new Date(now.getTime() + expireTimeMs);
 
@@ -63,6 +65,7 @@ public class JwtProvider {
 			.setSubject(String.valueOf(userId))
 			.claim("email", email)
 			.claim("name", name)
+			.claim("role", role)
 			.setIssuedAt(now)
 			.setExpiration(expiry)
 			.signWith(key, SignatureAlgorithm.HS256)
@@ -112,6 +115,12 @@ public class JwtProvider {
 	public String getNameFromToken(String token) {
 		Claims claims = getAllClaims(token);
 		return claims.get("name", String.class);
+	}
+
+	// 9. JWT에서 role 꺼내기
+	public Role getRoleFromToken(String token) {
+		Claims claims = getAllClaims(token);
+		return Role.valueOf(claims.get("role", String.class));
 	}
 
 	private Claims getAllClaims(String token) {

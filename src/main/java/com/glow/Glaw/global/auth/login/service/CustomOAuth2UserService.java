@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.glow.Glaw.domain.user.domain.User;
-import com.glow.Glaw.domain.user.domain.repository.UserRepository;
+import com.glow.Glaw.domain.user.repository.UserRepository;
 import com.glow.Glaw.global.auth.login.domain.CustomOAuth2User;
 import com.glow.Glaw.global.auth.login.dto.OAuthAttributes;
 
@@ -53,6 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService implements
 			user.getId(),
 			user.getEmail(),
 			user.getName(),
+			user.getRole(),
 			attributes
 		);
 	}
