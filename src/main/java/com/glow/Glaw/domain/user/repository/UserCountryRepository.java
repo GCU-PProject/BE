@@ -15,5 +15,7 @@ public interface UserCountryRepository extends JpaRepository<UserCountry, Long> 
 
 	// 특정 유저 + 국가 존재 여부 (중복 방지용)
 	boolean existsByUser_IdAndCountry_Id(Long userId, Long countryId);
-}
 
+	// 관심 나라 삭제
+	void deleteAllByUser_Id(Long userId);
+}
