@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.glow.Glaw.domain.shared.Role;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -45,12 +47,12 @@ public class JwtProvider {
 	}
 
 	// 1. Access Token 생성
-	public String createAccessToken(Long userId, String email, String name) {
+	public String createAccessToken(Long userId, String email, String name, Role role) {
 		return createToken(userId, email, name, accessTokenExpiration);
 	}
 
 	// 2. Refresh Token 생성
-	public String createRefreshToken(Long userId, String email, String name) {
+	public String createRefreshToken(Long userId, String email, String name, Role role) {
 		return createToken(userId, email, name, refreshTokenExpiration);
 	}
 
@@ -112,6 +114,12 @@ public class JwtProvider {
 	public String getNameFromToken(String token) {
 		Claims claims = getAllClaims(token);
 		return claims.get("name", String.class);
+	}
+
+	// 9. JWT에서 role 꺼내기
+	public Role getRoleFromToken(String token) {
+		Claims claims = getAllClaims(token);
+		return Role.valueOf(claims.get("role", String.class));
 	}
 
 	private Claims getAllClaims(String token) {

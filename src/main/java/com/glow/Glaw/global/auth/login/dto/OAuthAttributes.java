@@ -2,6 +2,7 @@ package com.glow.Glaw.global.auth.login.dto;
 
 import java.util.Map;
 
+import com.glow.Glaw.domain.shared.Role;
 import com.glow.Glaw.domain.user.domain.User;
 import com.glow.Glaw.global.auth.login.userInfo.GoogleOAuth2UserInfo;
 import com.glow.Glaw.global.auth.login.userInfo.OAuth2UserInfo;

@@ -53,6 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService implements
 			user.getId(),
 			user.getEmail(),
 			user.getName(),
+			user.getRole(),
 			attributes
 		);
 	}

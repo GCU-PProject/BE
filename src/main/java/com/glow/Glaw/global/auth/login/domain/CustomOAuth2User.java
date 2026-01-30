@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import com.glow.Glaw.domain.shared.Role;
+
 import lombok.Getter;
 
 // entity를 SecurityContext에 저장할 포맷 만들기
@@ -14,12 +16,14 @@ public class CustomOAuth2User implements OAuth2User {
 	private final Long userId;
 	private final String email;
 	private final String name;
+	private final Role role;
 	private final Map<String, Object> attributes;
 
-	public CustomOAuth2User(Long userId, String email, String name, Map<String, Object> attributes) {
+	public CustomOAuth2User(Long userId, String email, String name, Role role, Map<String, Object> attributes) {
 		this.userId = userId;
 		this.email = email;
 		this.name = name;
+		this.role = role;
 		this.attributes = attributes;
 	}
 
@@ -34,7 +38,7 @@ public class CustomOAuth2User implements OAuth2User {
 		return null;
 	}
 
-	// 주요 식별 키 (email)
+	// 주요 식별 키 (userId)
 	@Override
 	public String getName() {
 		return userId.toString();

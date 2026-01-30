@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.glow.Glaw.domain.shared.Role;
 import com.glow.Glaw.global.auth.jwt.JwtProvider;
 import com.glow.Glaw.global.auth.login.domain.CustomOAuth2User;
 
@@ -33,12 +34,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		Long userId = oAuth2User.getUserId();
 		String email = oAuth2User.getEmail();
 		String name = oAuth2User.getName();
+		Role role = oAuth2User.getRole();
 
-		log.info("Login Success, userId={}, email={}", userId, email);
+		log.info("Login Success, userId={}, email={}, role={}", userId, email, role);
 
 		// 2) AccessToken, RefreshToken 생성
-		String accessToken = jwtProvider.createAccessToken(userId, email, name);
-		String refreshToken = jwtProvider.createRefreshToken(userId, email, name);
+		String accessToken = jwtProvider.createAccessToken(userId, email, name, role);
+		String refreshToken = jwtProvider.createRefreshToken(userId, email, name, role);
 
 		// 3) RefreshToken 저장
 		jwtProvider.storeRefreshToken(userId, refreshToken);
@@ -55,7 +57,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		response.addCookie(refreshCookie);
 
 		// 6) 프론트로 최종 리다이렉트
-		response.sendRedirect("http://localhost:3000/");
+		// 사용자 권한에 따라 redirect URL 설정
+		if (role == Role.ROLE_GUEST) {
+			response.sendRedirect("http://localhost:3000/onboarding");
+		} else {
+			response.sendRedirect("http://localhost:3000");
+		}
+
 		log.info("AccessToken: {}", accessToken);
 	}
 }

@@ -1,9 +1,12 @@
 package com.glow.Glaw.domain.user.domain;
 
 import com.glow.Glaw.domain.shared.BaseTimeEntity;
+import com.glow.Glaw.domain.shared.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,11 +31,15 @@ public class User extends BaseTimeEntity {
 	@Column(nullable = false)
 	private String name;
 
+	@Enumerated(EnumType.STRING)
+	private Role role;
+
 	// Builder를 통해서만 객체 생성
 	@Builder
 	private User(String email, String name) {
 		this.email = email;
 		this.name = name;
+		this.role = Role.ROLE_GUEST;
 	}
 
 	// 사용자 생성 Method
