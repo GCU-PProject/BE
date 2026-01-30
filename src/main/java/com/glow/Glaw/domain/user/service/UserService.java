@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class UserService {
 	private final UserRepository userRepository;
 	private final UserCountryRepository userCountryRepository;
@@ -59,6 +59,7 @@ public class UserService {
 
 		// 1) 기존 관심 국가 전부 삭제
 		userCountryRepository.deleteAllByUser_Id(userId);
+		userCountryRepository.flush();
 
 		// 2) 새로 등록
 		for (Long countryId : countryIds) {
