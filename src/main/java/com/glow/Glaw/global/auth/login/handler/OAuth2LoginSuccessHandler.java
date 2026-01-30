@@ -47,7 +47,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		response.addHeader("Authorization", "Bearer " + accessToken);
 
 		// 5) RefreshToken -> HttpOnly Cookie에 저장
-		Cookie refreshCookie = new Cookie("refresh", refreshToken);
+		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 		refreshCookie.setHttpOnly(true);
 		refreshCookie.setSecure(true);
 		refreshCookie.setPath("/");
@@ -56,5 +56,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		// 6) 프론트로 최종 리다이렉트
 		response.sendRedirect("http://localhost:3000/");
+		log.info("AccessToken: {}", accessToken);
 	}
 }

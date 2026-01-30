@@ -140,7 +140,7 @@ public class JwtProvider {
 		if (request.getCookies() == null) return Optional.empty();
 
 		for (Cookie cookie : request.getCookies()) {
-			if (cookie.getName().equals("refresh-token")) {
+			if (cookie.getName().equals("refreshToken")) {
 				return Optional.of(cookie.getValue());
 			}
 		}
