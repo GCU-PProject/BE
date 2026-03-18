@@ -11,6 +11,8 @@ import com.glow.Glaw.global.auth.login.domain.CustomOAuth2User;
 import com.glow.Glaw.global.auth.onboarding.dto.request.OnboardingRequestDto;
 import com.glow.Glaw.global.auth.onboarding.dto.response.OnboardingResponseDto;
 import com.glow.Glaw.global.auth.onboarding.service.OnboardingService;
+import com.glow.Glaw.global.error.ErrorCode;
+import com.glow.Glaw.global.error.exception.CommonException;
 import com.glow.Glaw.global.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,10 @@ public class OnboardingController {
 		@AuthenticationPrincipal CustomOAuth2User user,
 		@RequestBody OnboardingRequestDto onboardingRequestDto
 	) {
+		if (user == null) {
+			throw new CommonException(ErrorCode.JWT_TOKEN_INVALID);
+		}
+
 		OnboardingResponseDto response = onboardingService.complete(
 			user.getUserId(),
 			onboardingRequestDto
