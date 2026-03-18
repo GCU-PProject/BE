@@ -3,6 +3,9 @@ package com.glow.Glaw.global.auth.login.service;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.glow.Glaw.global.error.ErrorCode;
+import com.glow.Glaw.global.error.exception.CommonException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +29,7 @@ public class RefreshTokenService {
 		log.info("refreshToken: {}", refreshToken);
 
 		if (storedToken == null || !storedToken.equals(refreshToken)) {
-			throw new RuntimeException("Refresh Token이 일차하지 않습니다.");
+			throw new CommonException(ErrorCode.JWT_TOKEN_INVALID);
 		}
 	}
 

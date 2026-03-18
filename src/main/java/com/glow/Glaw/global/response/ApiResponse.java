@@ -18,9 +18,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ApiResponse<T> {
 	private boolean success;
-	private int code;
-	private LocalDateTime timestamp;
+	private int status;
+	private String code;
 	private String message;
+	private LocalDateTime timestamp;
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private T result;
@@ -29,24 +30,26 @@ public class ApiResponse<T> {
 	private Map<String, String> error;
 
 	@Builder
-	public ApiResponse(LocalDateTime timestamp, String message, boolean success, int code, T result,
+	public ApiResponse(boolean success, int status, String code, String message, LocalDateTime timestamp, T result,
 		Map<String, String> error) {
-		this.timestamp = timestamp;
 		this.success = success;
-		this.message = message;
+		this.status = status;
 		this.code = code;
+		this.message = message;
+		this.timestamp = timestamp;
 		this.result = result;
 		this.error = error;
 	}
 
 	// 201 Create 성공 응답
-	public static <T> ApiResponse<T> success(T result, int code) {
+	public static <T> ApiResponse<T> success(T result, int status) {
 		LocalDateTime now = LocalDateTime.now();
 		return ApiResponse.<T>builder()
-			.timestamp(now)
 			.success(true)
+			.status(status)
+			.code("SUCCESS")
 			.message("성공")
-			.code(code)
+			.timestamp(now)
 			.result(result)
 			.error(null)
 			.build();
@@ -56,10 +59,11 @@ public class ApiResponse<T> {
 	public static <T> ApiResponse<T> success(String message, T result) {
 		LocalDateTime now = LocalDateTime.now();
 		return ApiResponse.<T>builder()
-			.timestamp(now)
 			.success(true)
+			.status(200)
+			.code("SUCCESS")
 			.message(message)  // 커스텀 메시지 사용
-			.code(200)
+			.timestamp(now)
 			.result(result)
 			.error(null)
 			.build();
@@ -86,10 +90,11 @@ public class ApiResponse<T> {
 	public static <T> ApiResponse<T> fail(ErrorCode code, Map<String, String> errorMap) {
 		LocalDateTime now = LocalDateTime.now();
 		return ApiResponse.<T>builder()
-			.timestamp(now)
 			.success(false)
+			.status(code.getStatus())
+			.code(code.getCode())
 			.message(code.getMessage())
-			.code(code.getStatus())
+			.timestamp(now)
 			.result(null)
 			.error(errorMap)
 			.build();
@@ -100,9 +105,10 @@ public class ApiResponse<T> {
 		LocalDateTime now = LocalDateTime.now();
 		return ApiResponse.<T>builder()
 			.success(false)
-			.code(code.getStatus())
-			.timestamp(now)
+			.status(code.getStatus())
+			.code(code.getCode())
 			.message(message)
+			.timestamp(now)
 			.result(null)
 			.error(null)
 			.build();
@@ -113,9 +119,10 @@ public class ApiResponse<T> {
 		LocalDateTime now = LocalDateTime.now();
 		return ApiResponse.<T>builder()
 			.success(false)
-			.code(code.getStatus())
-			.timestamp(now)
+			.status(code.getStatus())
+			.code(code.getCode())
 			.message(code.getMessage())
+			.timestamp(now)
 			.result(null)
 			.error(null)
 			.build();

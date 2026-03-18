@@ -12,6 +12,8 @@ import com.glow.Glaw.domain.user.domain.User;
 import com.glow.Glaw.domain.user.repository.UserRepository;
 import com.glow.Glaw.global.auth.jwt.JwtProvider;
 import com.glow.Glaw.global.auth.login.service.RefreshTokenService;
+import com.glow.Glaw.global.error.ErrorCode;
+import com.glow.Glaw.global.error.exception.CommonException;
 import com.glow.Glaw.global.response.ApiResponse;
 
 import jakarta.servlet.http.Cookie;
@@ -34,11 +36,11 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<Map<String, String>>> reissue(HttpServletRequest request) {
 		// 1) RefreshToken 쿠키에서 꺼내기
 		String refreshToken = jwtProvider.extractRefreshCookie(request)
-			.orElseThrow(() -> new RuntimeException("Refresh Token Not Found"));
+			.orElseThrow(() -> new CommonException(ErrorCode.JWT_TOKEN_MISSING));
 
 		// 2) RefreshToken 유효성 검사
 		if (!jwtProvider.validateToken(refreshToken)) {
-			throw new RuntimeException("Invalid Refresh Token");
+			throw new CommonException(ErrorCode.JWT_TOKEN_INVALID);
 		}
 
 		// 3) refreshToken에서 email / userId 파싱
@@ -49,7 +51,7 @@ public class AuthController {
 
 		// 4) 유저 존재 여부 확인
 		User user = userRepository.findByEmail(email)
-			.orElseThrow(() -> new RuntimeException("User Not Found"));
+			.orElseThrow(() -> new CommonException(ErrorCode.USER_NOT_FOUND));
 
 		// 5) Redis에 저장된 RefreshToken과 일치하는지 확인
 		refreshTokenService.validateStoredRefreshToken(user.getId(), refreshToken);
