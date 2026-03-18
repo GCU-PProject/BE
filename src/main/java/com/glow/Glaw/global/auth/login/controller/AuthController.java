@@ -12,6 +12,7 @@ import com.glow.Glaw.domain.user.domain.User;
 import com.glow.Glaw.domain.user.repository.UserRepository;
 import com.glow.Glaw.global.auth.jwt.JwtProvider;
 import com.glow.Glaw.global.auth.login.service.RefreshTokenService;
+import com.glow.Glaw.global.response.ApiResponse;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class AuthController {
 
 	// 1. AccessToken 재발급 (RefreshToken으로 AccessToken 발급)
 	@PostMapping("/reissue")
-	public ResponseEntity<?> reissue(HttpServletRequest request) {
+	public ResponseEntity<ApiResponse<Map<String, String>>> reissue(HttpServletRequest request) {
 		// 1) RefreshToken 쿠키에서 꺼내기
 		String refreshToken = jwtProvider.extractRefreshCookie(request)
 			.orElseThrow(() -> new RuntimeException("Refresh Token Not Found"));
@@ -59,12 +60,14 @@ public class AuthController {
 		log.info("New Access Token: {}", newAccessToken);
 
 		// 7) 프론트에 반환
-		return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+		return ResponseEntity.ok(
+			ApiResponse.success("AccessToken 재발급 성공", Map.of("accessToken", newAccessToken))
+		);
 	}
 
 	// 2. 로그아웃 (RefreshToken 삭제 + 쿠키 만료)
 	@PostMapping("/logout")
-	public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+	public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request, HttpServletResponse response) {
 		// 1) 쿠키에서 refreshToken 꺼내기
 		String refreshToken = jwtProvider.extractRefreshCookie(request).orElse(null);
 
@@ -80,7 +83,9 @@ public class AuthController {
 
 		log.info("로그아웃 완료");
 
-		return ResponseEntity.ok(Map.of("message", "로그아웃 완료"));
+		return ResponseEntity.ok(
+			ApiResponse.success("로그아웃 성공", null)
+		);
 	}
 
 	// 쿠키 삭제
