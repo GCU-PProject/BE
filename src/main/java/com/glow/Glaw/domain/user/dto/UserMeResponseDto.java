@@ -22,5 +22,7 @@ public class UserMeResponseDto {
 		private Long countryId;
 		private String code;
 		private String name;
+		private String stateCode;
+		private String stateName;
 	}
 }

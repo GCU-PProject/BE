@@ -19,11 +19,18 @@ import lombok.NoArgsConstructor;
 public class Country extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "country_id")
 	private Long id;
 
-	@Column(length = 2, nullable = false, unique = true)
-	private String code;
+	@Column(name = "country_code", length = 10, nullable = false)
+	private String countryCode;
 
-	@Column(nullable = false)
-	private String name;
+	@Column(name = "country_name", length = 100, nullable = false)
+	private String countryName;
+
+	@Column(name = "state_code", length = 10, nullable = true)
+	private String stateCode;
+
+	@Column(name = "state_name", length = 100, nullable = true)
+	private String stateName;
 }

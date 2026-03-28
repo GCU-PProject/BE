@@ -33,8 +33,10 @@ public class UserService {
 		List<UserMeResponseDto.CountryDto> countries = userCountries.stream()
 			.map(uc -> new UserMeResponseDto.CountryDto(
 				uc.getCountry().getId(),
-				uc.getCountry().getCode(),
-				uc.getCountry().getName()
+				uc.getCountry().getCountryCode(),
+				uc.getCountry().getCountryName(),
+				uc.getCountry().getStateCode(),
+				uc.getCountry().getStateName()
 			))
 			.toList();
 

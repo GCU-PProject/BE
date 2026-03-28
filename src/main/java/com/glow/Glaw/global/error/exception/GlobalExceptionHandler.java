@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -33,21 +32,21 @@ public class GlobalExceptionHandler {
 	private ResponseEntity<ApiResponse<Void>> buildErrorResponse(ErrorCode errorCode, Map<String, String> errors) {
 		//ErrorResponse errorResponse = ErrorResponse.of(errorCode); //기능 확장시 사용할 것
 		return ResponseEntity
-			.status(HttpStatus.valueOf(errorCode.getStatus()))
+			.status(errorCode.getStatus())
 			.body(ApiResponse.fail(errorCode, errors));
 	}
 
 	// 단일 에러 처리
 	private ResponseEntity<ApiResponse<Void>> buildErrorResponse(ErrorCode errorCode) {
 		return ResponseEntity
-			.status(HttpStatus.valueOf(errorCode.getStatus()))
+			.status(errorCode.getStatus())
 			.body(ApiResponse.fail(errorCode));
 	}
 
 	// 단일 에러 처리
 	private ResponseEntity<ApiResponse<Void>> buildErrorResponse(ErrorCode errorCode, String message) {
 		return ResponseEntity
-			.status(HttpStatus.valueOf(errorCode.getStatus()))
+			.status(errorCode.getStatus())
 			.body(ApiResponse.fail(errorCode, message));
 	}
 
@@ -56,8 +55,8 @@ public class GlobalExceptionHandler {
 	public  ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
 		ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
 
-		log.error(ex.getMessage());
-		return buildErrorResponse(errorCode, errorCode.getMessage());
+		log.error("Unexpected Exception: ", ex);
+		return buildErrorResponse(errorCode);
 	}
 
 	// 커스텀 처리된 에러 처리(해당 코드)
@@ -66,7 +65,7 @@ public class GlobalExceptionHandler {
 		ErrorCode errorCode = ex.getErrorCode(); // 전달된 예외에서 에러 코드 가져오기
 
 		showErrorLog(errorCode);
-		return buildErrorResponse(errorCode, errorCode.getMessage());
+		return buildErrorResponse(errorCode);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -128,21 +127,4 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
 		return buildErrorResponse(ErrorCode.VALIDATION_ERROR, "필수 입력 필드가 누락되었습니다.");
 	}
-
-	// @ExceptionHandler(HttpMessageConversionException.class)
-	// public ResponseEntity<ApiResponse<Void>> handleHttpMessageConversionException(HttpMessageConversionException ex) {
-	// 	String errorMessage = "잘못된 요청 형식입니다. multipart/form-data 형식으로 요청해주세요.";
-	//
-	// 	if (ex.getCause() instanceof InvalidDefinitionException && ex.getMessage().contains("MultipartFile")) {
-	// 		errorMessage = "파일 업로드는 multipart/form-data 형식으로 요청해주세요.";
-	// 	}
-	// 	return buildErrorResponse(ErrorCode.INVALID_REQUEST_FORMAT, errorMessage);
-	// }
-	//
-	// @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-	// public ResponseEntity<ApiResponse<Void>> handleHttpMediaTypeNotSupportedException(
-	// 	HttpMediaTypeNotSupportedException ex) {
-	// 	return buildErrorResponse(ErrorCode.UNSUPPORTED_MEDIA_TYPE,
-	// 		"지원하지 않는 Content-Type입니다. multipart/form-data 형식으로 요청해주세요.");
-	// }
 }
