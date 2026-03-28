@@ -39,7 +39,8 @@ public class SecurityConfig {
 		configuration.setAllowedOrigins(Arrays.asList(
 			"http://localhost:3000",
 			"http://localhost:5173",
-			"http://localhost:8080"
+			"http://localhost:8080",
+			"http://api.glaw.site"
 		));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
@@ -73,7 +74,8 @@ public class SecurityConfig {
 					"/oauth2/**",
 					"/api/auth/login",
 					"/swagger-ui/**",
-					"/v3/api-docs/**"
+					"/v3/api-docs/**",
+					"/health"
 				).permitAll()
 				// 최초 로그인
 				.requestMatchers("/api/auth/onboarding")
