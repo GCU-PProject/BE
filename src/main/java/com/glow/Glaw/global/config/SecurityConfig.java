@@ -1,12 +1,20 @@
 package com.glow.Glaw.global.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.glow.Glaw.global.auth.handler.CustomAccessDeniedHandler;
+import com.glow.Glaw.global.auth.handler.CustomAuthenticationEntryPoint;
 import com.glow.Glaw.global.auth.jwt.JwtAuthenticationFilter;
 import com.glow.Glaw.global.auth.login.handler.OAuth2LoginSuccessHandler;
 import com.glow.Glaw.global.auth.login.service.CustomOAuth2UserService;
@@ -21,17 +29,46 @@ public class SecurityConfig {
 	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+
+		configuration.setAllowedOrigins(Arrays.asList(
+			"http://localhost:3000",
+			"http://localhost:5173",
+			"http://localhost:8080"
+		));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.setExposedHeaders(Arrays.asList("Content-Type", "Authorization", "Authorization-refresh", "accept"));
+		configuration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			// 1) JWT 기반 인증 -> 세션 사용 없음
+			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(csrf -> csrf.disable())
 			.sessionManagement(session ->
 				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			)
 
+			.exceptionHandling(exception -> exception
+				.accessDeniedHandler(customAccessDeniedHandler)
+				.authenticationEntryPoint(customAuthenticationEntryPoint)
+			)
+
 			// 2) URL 권한 설정
 			.authorizeHttpRequests(auth -> auth
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.requestMatchers(
 					"/oauth2/**",
 					"/api/auth/login",
