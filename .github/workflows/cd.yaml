@@ -1,0 +1,39 @@
+name: Java CD (Deploy to GCP)
+
+on:
+  workflow_run:
+    workflows: ["Java CI with Gradle (PR & Push)"]
+    types: [completed]
+    branches: [ "dev" ]
+
+jobs:
+  deploy:
+    # 조건: CI가 성공했고, 그 원인이 'push(머지)'일 때만 실행
+    if: |
+      github.event.workflow_run.conclusion == 'success' && 
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Google Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: SSH Deploy
+        run: |
+          gcloud compute ssh ${{ secrets.GCP_VM_NAME }} \
+            --zone=${{ secrets.GCP_VM_ZONE }} \
+            --tunnel-through-iap \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --command="
+              echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USER_NAME }} --password-stdin
+              sudo docker pull ${{ secrets.DOCKER_USER_NAME }}/glaw:latest
+              sudo docker stop glaw-server || true
+              sudo docker rm glaw-server || true
+              sudo docker run -d --name glaw-server -p 8080:8080 ${{ secrets.DOCKER_USER_NAME }}/glaw:latest
+              sudo docker image prune -f
+            "
