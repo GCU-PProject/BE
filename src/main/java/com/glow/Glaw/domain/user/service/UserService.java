@@ -34,7 +34,9 @@ public class UserService {
 			.map(uc -> new UserMeResponseDto.CountryDto(
 				uc.getCountry().getId(),
 				uc.getCountry().getCountryCode(),
-				uc.getCountry().getCountryName()
+				uc.getCountry().getCountryName(),
+				uc.getCountry().getStateCode(),
+				uc.getCountry().getStateName()
 			))
 			.toList();
 
