@@ -43,6 +43,7 @@ jobs:
           echo "${{ secrets.YAML_DEV }}" > ./src/main/resources/application-dev.yaml
           echo "${{ secrets.YAML_OAUTH }}" > ./src/main/resources/application-oauth.yaml
           echo "${{ secrets.YAML_JWT }}" > ./src/main/resources/application-jwt.yaml
+          echo "${{ secrets.YAML_COMPOSE }}" > docker-compose.yaml
         shell: bash
 
       # 3. Gradle 빌드 및 테스트 (PR/Push 공통)
