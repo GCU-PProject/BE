@@ -15,6 +15,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 public class SwaggerConfig {
 	@Bean
 	public OpenAPI openAPI() {
+		io.swagger.v3.oas.models.servers.Server server = new io.swagger.v3.oas.models.servers.Server();
+		server.setUrl("http://api.glaw.site");
 
 		Info info = new Info()
 			.title("GLAW API Documentation")
@@ -31,6 +33,7 @@ public class SwaggerConfig {
 
 		return new OpenAPI()
 			.info(info)
+			.servers(List.of(server))
 			.components(new Components().addSecuritySchemes("BearerAuth", bearerScheme))
 			.security(List.of(securityRequirement));
 	}
