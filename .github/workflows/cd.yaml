@@ -23,19 +23,20 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: SSH Deploy
-        run: |
-          # 1. 실행할 명령어를 변수로 깔끔하게 정의 (빨간 줄 방지)
-          DEPLOY_CMD="
-            echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin && \
-            echo '${{ secrets.YAML_COMPOSE }}' > ~/docker-compose.yml && \
-            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml pull && \
-            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml up -d && \
+        env:
+          # 1. 실행할 전체 스크립트를 환경 변수로 정의 (들여쓰기 걱정 NO!)
+          DEPLOY_SCRIPT: |
+            echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin
+            cat <<'EOF' > ~/docker-compose.yml
+            ${{ secrets.YAML_COMPOSE }}
+            EOF
+            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml pull
+            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml up -d
             sudo docker image prune -f
-          "
-
-          # 2. 정의한 명령어를 한 번에 실행
+        run: |
+          # 2. 정의된 스크립트를 gcloud를 통해 서버로 전달
           gcloud compute ssh ${{ secrets.GCP_VM_NAME }} \
             --zone=${{ secrets.GCP_VM_ZONE }} \
             --tunnel-through-iap \
             --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command=\"$DEPLOY_CMD\"
+            --command="$DEPLOY_SCRIPT"
