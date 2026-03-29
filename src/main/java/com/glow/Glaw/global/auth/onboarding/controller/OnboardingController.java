@@ -43,7 +43,8 @@ public class OnboardingController {
 		// AccessToken -> HttpOnly Cookie에 저장
 		Cookie accessCookie = new Cookie("accessToken", tokens.getAccessToken());
 		accessCookie.setHttpOnly(true);
-		accessCookie.setSecure(true);
+		accessCookie.setSecure(false);
+		accessCookie.setDomain(".glaw.site");
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
 		response.addCookie(accessCookie);
@@ -51,11 +52,12 @@ public class OnboardingController {
 		// RefreshToken -> HttpOnly Cookie에 저장
 		Cookie refreshCookie = new Cookie("refreshToken", tokens.getRefreshToken());
 		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(true);
+		refreshCookie.setSecure(false);
+		refreshCookie.setDomain(".glaw.site");
 		refreshCookie.setPath("/");
 		refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
 		response.addCookie(refreshCookie);
-		
+
 		return ResponseEntity.ok(ApiResponse.success("온보딩 완료", null));
 	}
 }
