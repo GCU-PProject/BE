@@ -1,6 +1,7 @@
 package com.glow.Glaw.global.auth.jwt;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,7 @@ import com.glow.Glaw.global.auth.login.domain.CustomOAuth2User;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,15 +33,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		HttpServletResponse response,
 		FilterChain filterChain
 	) throws ServletException, IOException {
-		// 1) Authorization 헤더에서 AccessToken 추출
-		String authorization = request.getHeader("Authorization");
+		// 1) znzldptj AccessToken 추출
+		String token = extractTokenFromCookie(request);
 
-		if (authorization == null || !authorization.startsWith("Bearer ")) {
+		if (token == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
-
-		String token = authorization.substring(7);
 
 		// 2) 토큰 검증
 		if (!jwtProvider.validateToken(token)) {
@@ -76,5 +76,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		filterChain.doFilter(request, response);
+	}
+
+	private String extractTokenFromCookie(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies == null) {
+			return null;
+		}
+
+		return Arrays.stream(cookies)
+			.filter(cookie -> "accessToken".equals(cookie.getName()))
+			.map(Cookie::getValue)
+			.findFirst()
+			.orElse(null);
 	}
 }
