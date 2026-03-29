@@ -8,7 +8,6 @@ on:
 
 jobs:
   deploy:
-    # 조건: CI가 성공했고, 그 원인이 'push(머지)'일 때만 실행
     if: |
       github.event.workflow_run.conclusion == 'success' && 
       github.event.workflow_run.event == 'push'
@@ -25,28 +24,18 @@ jobs:
 
       - name: SSH Deploy
         run: |
+          # 1. 실행할 명령어를 변수로 깔끔하게 정의 (빨간 줄 방지)
+          DEPLOY_CMD="
+            echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin && \
+            echo '${{ secrets.YAML_COMPOSE }}' > ~/docker-compose.yml && \
+            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml pull && \
+            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml up -d && \
+            sudo docker image prune -f
+          "
+
+          # 2. 정의한 명령어를 한 번에 실행
           gcloud compute ssh ${{ secrets.GCP_VM_NAME }} \
             --zone=${{ secrets.GCP_VM_ZONE }} \
             --tunnel-through-iap \
             --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="
-              # 1. 도커 허브 로그인
-              echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin
-          
-              # 2. GitHub Secrets에서 가져온 컴포즈 파일 생성 (덮어쓰기)
-              cat <<EOF > ~/docker-compose.yaml
-              ${{ secrets.YAML_COMPOSE }}
-              EOF
-          
-              # 3. 기존에 수동으로 띄웠던 컨테이너 정리 (안전하게 싹 지우기)
-              sudo docker stop glaw-server redis || true
-              sudo docker rm glaw-server redis || true
-          
-              # 4. 컴포즈로 배포 시작
-              # 최신 이미지 풀 -> 컨테이너 생성/실행 (네트워크/환경변수 자동 적용)
-              sudo docker-compose pull
-              sudo docker-compose up -d
-          
-              # 5. 불필요한 이미지 정리
-              sudo docker image prune -f
-            "
+            --command=\"$DEPLOY_CMD\"
