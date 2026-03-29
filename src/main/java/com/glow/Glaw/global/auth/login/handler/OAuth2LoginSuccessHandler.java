@@ -48,7 +48,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// 4) AccessToken -> HttpOnly Cookie에 저장
 		Cookie accessCookie = new Cookie("accessToken", accessToken);
 		accessCookie.setHttpOnly(true);
-		accessCookie.setSecure(true);
+		accessCookie.setSecure(false);
+		accessCookie.setDomain(".glaw.site");
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
 		response.addCookie(accessCookie);
@@ -56,7 +57,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// 5) RefreshToken -> HttpOnly Cookie에 저장
 		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(true);
+		refreshCookie.setSecure(false);
+		refreshCookie.setDomain(".glaw.site");
 		refreshCookie.setPath("/");
 		refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
 		response.addCookie(refreshCookie);

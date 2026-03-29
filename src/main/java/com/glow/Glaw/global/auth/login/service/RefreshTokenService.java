@@ -35,6 +35,6 @@ public class RefreshTokenService {
 
 	// Redis에 Refresh Token 삭제 (로그아웃)
 	public void deleteRefreshToken(Long userId) {
-		redisTemplate.delete("user:" + userId);
+		redisTemplate.delete("RT:" + userId);
 	}
 }

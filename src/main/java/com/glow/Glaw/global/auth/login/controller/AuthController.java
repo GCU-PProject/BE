@@ -60,7 +60,8 @@ public class AuthController {
 		// 7) AccessToken -> HttpOnly Cookie에 저장
 		Cookie accessCookie = new Cookie("accessToken", newAccessToken);
 		accessCookie.setHttpOnly(true);
-		accessCookie.setSecure(true);
+		accessCookie.setSecure(false);
+		accessCookie.setDomain(".glaw.site");
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
 		response.addCookie(accessCookie);
@@ -98,6 +99,7 @@ public class AuthController {
 	private void expireCookie(HttpServletResponse response, String name) {
 		Cookie cookie = new Cookie(name, null);
 		cookie.setPath("/");
+		cookie.setDomain(".glaw.site");
 		cookie.setHttpOnly(true);
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
