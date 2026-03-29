@@ -49,7 +49,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		Cookie accessCookie = new Cookie("accessToken", accessToken);
 		accessCookie.setHttpOnly(true);
 		accessCookie.setSecure(false);
-		accessCookie.setDomain(".glaw.site");
+		accessCookie.setDomain("glaw.site");
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
 		response.addCookie(accessCookie);
