@@ -15,6 +15,8 @@ import com.glow.Glaw.global.error.ErrorCode;
 import com.glow.Glaw.global.error.exception.CommonException;
 import com.glow.Glaw.global.response.ApiResponse;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,21 +26,36 @@ public class OnboardingController {
 	private final OnboardingService onboardingService;
 
 	@PostMapping("/onboarding")
-	public ResponseEntity<ApiResponse<OnboardingResponseDto>> onboarding(
+	public ResponseEntity<ApiResponse<Void>> onboarding(
 		@AuthenticationPrincipal CustomOAuth2User user,
-		@RequestBody OnboardingRequestDto onboardingRequestDto
+		@RequestBody OnboardingRequestDto onboardingRequestDto,
+		HttpServletResponse response
 	) {
 		if (user == null) {
 			throw new CommonException(ErrorCode.JWT_TOKEN_INVALID);
 		}
 
-		OnboardingResponseDto response = onboardingService.complete(
+		OnboardingResponseDto tokens = onboardingService.complete(
 			user.getUserId(),
 			onboardingRequestDto
 		);
 
-		return ResponseEntity.ok(
-			ApiResponse.success("온보딩 완료", response)
-		);
+		// AccessToken -> HttpOnly Cookie에 저장
+		Cookie accessCookie = new Cookie("accessToken", tokens.getAccessToken());
+		accessCookie.setHttpOnly(true);
+		accessCookie.setSecure(true);
+		accessCookie.setPath("/");
+		accessCookie.setMaxAge(60 * 60); // 1시간
+		response.addCookie(accessCookie);
+
+		// RefreshToken -> HttpOnly Cookie에 저장
+		Cookie refreshCookie = new Cookie("refreshToken", tokens.getRefreshToken());
+		refreshCookie.setHttpOnly(true);
+		refreshCookie.setSecure(true);
+		refreshCookie.setPath("/");
+		refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
+		response.addCookie(refreshCookie);
+		
+		return ResponseEntity.ok(ApiResponse.success("온보딩 완료", null));
 	}
 }
