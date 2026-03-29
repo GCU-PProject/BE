@@ -58,7 +58,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 		refreshCookie.setHttpOnly(true);
 		refreshCookie.setSecure(false);
-		refreshCookie.setDomain(".glaw.site");
+		refreshCookie.setDomain("glaw.site");
 		refreshCookie.setPath("/");
 		refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
 		response.addCookie(refreshCookie);
