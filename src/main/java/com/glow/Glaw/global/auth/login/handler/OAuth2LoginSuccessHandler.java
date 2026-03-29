@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-// AccessToken / RefreshToken 발급 후 accesstoken은 헤더로, refreshtoken은 쿠키로 프론트에 전달
+// AccessToken / RefreshToken 발급 후 HttpOnly 쿠키로 프론트에 전달
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -45,8 +45,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// 3) RefreshToken 저장
 		jwtProvider.storeRefreshToken(userId, refreshToken);
 
-		// 4) AccessToken -> Response Header 전달
-		response.addHeader("Authorization", "Bearer " + accessToken);
+		// 4) AccessToken -> HttpOnly Cookie에 저장
+		Cookie accessCookie = new Cookie("accessToken", accessToken);
+		accessCookie.setHttpOnly(true);
+		accessCookie.setSecure(true);
+		accessCookie.setPath("/");
+		accessCookie.setMaxAge(60 * 60); // 1시간
+		response.addCookie(accessCookie);
 
 		// 5) RefreshToken -> HttpOnly Cookie에 저장
 		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
