@@ -59,9 +59,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// 6) 프론트로 최종 리다이렉트
 		// 사용자 권한에 따라 redirect URL 설정
 		if (role == Role.ROLE_GUEST) {
-			response.sendRedirect("http://localhost:3000/onboarding");
+			response.sendRedirect("http://glaw.site/onboarding");
 		} else {
-			response.sendRedirect("http://localhost:3000");
+			response.sendRedirect("http://glaw.site");
 		}
 
 		log.info("AccessToken: {}", accessToken);
