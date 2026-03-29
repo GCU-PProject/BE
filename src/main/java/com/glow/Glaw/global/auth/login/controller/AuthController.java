@@ -1,7 +1,5 @@
 package com.glow.Glaw.global.auth.login.controller;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +31,7 @@ public class AuthController {
 
 	// 1. AccessToken 재발급 (RefreshToken으로 AccessToken 발급)
 	@PostMapping("/reissue")
-	public ResponseEntity<ApiResponse<Map<String, String>>> reissue(HttpServletRequest request) {
+	public ResponseEntity<ApiResponse<Void>> reissue(HttpServletRequest request, HttpServletResponse response) {
 		// 1) RefreshToken 쿠키에서 꺼내기
 		String refreshToken = jwtProvider.extractRefreshCookie(request)
 			.orElseThrow(() -> new CommonException(ErrorCode.JWT_TOKEN_MISSING));
@@ -59,12 +57,18 @@ public class AuthController {
 		// 6) 새 AccessToken 발급
 		String newAccessToken = jwtProvider.createAccessToken(userId, email, name, role);
 
+		// 7) AccessToken -> HttpOnly Cookie에 저장
+		Cookie accessCookie = new Cookie("accessToken", newAccessToken);
+		accessCookie.setHttpOnly(true);
+		accessCookie.setSecure(true);
+		accessCookie.setPath("/");
+		accessCookie.setMaxAge(60 * 60); // 1시간
+		response.addCookie(accessCookie);
+
 		log.info("New Access Token: {}", newAccessToken);
 
-		// 7) 프론트에 반환
-		return ResponseEntity.ok(
-			ApiResponse.success("AccessToken 재발급 성공", Map.of("accessToken", newAccessToken))
-		);
+		// 8) 프론트에 반환
+		return ResponseEntity.ok(ApiResponse.success("AccessToken 재발급 성공", null));
 	}
 
 	// 2. 로그아웃 (RefreshToken 삭제 + 쿠키 만료)
@@ -81,13 +85,13 @@ public class AuthController {
 			refreshTokenService.deleteRefreshToken(userId);
 		}
 
+		// 4) 쿠키 삭제 (AccessToken + RefreshToken)
+		expireCookie(response, "accessToken");
 		expireCookie(response, "refreshToken");
 
 		log.info("로그아웃 완료");
 
-		return ResponseEntity.ok(
-			ApiResponse.success("로그아웃 성공", null)
-		);
+		return ResponseEntity.ok(ApiResponse.success("로그아웃 성공", null));
 	}
 
 	// 쿠키 삭제
