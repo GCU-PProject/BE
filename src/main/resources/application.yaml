@@ -2,7 +2,7 @@ spring:
   application:
     name: Glaw
   profiles:
-    active: local, jwt, oauth
+    active: dev, jwt, oauth
 
 springdoc:
   swagger-ui:
