@@ -30,10 +30,23 @@ jobs:
             --tunnel-through-iap \
             --project=${{ secrets.GCP_PROJECT_ID }} \
             --command="
-              echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USER_NAME }} --password-stdin
-              sudo docker pull ${{ secrets.DOCKER_USER_NAME }}/glaw:latest
-              sudo docker stop glaw-server || true
-              sudo docker rm glaw-server || true
-              sudo docker run -d --name glaw-server -p 8080:8080 ${{ secrets.DOCKER_USER_NAME }}/glaw:latest
+              # 1. 도커 허브 로그인
+              echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin
+          
+              # 2. GitHub Secrets에서 가져온 컴포즈 파일 생성 (덮어쓰기)
+              cat <<EOF > ~/docker-compose.yaml
+              ${{ secrets.YAML_COMPOSE }}
+              EOF
+          
+              # 3. 기존에 수동으로 띄웠던 컨테이너 정리 (안전하게 싹 지우기)
+              sudo docker stop glaw-server redis || true
+              sudo docker rm glaw-server redis || true
+          
+              # 4. 컴포즈로 배포 시작
+              # 최신 이미지 풀 -> 컨테이너 생성/실행 (네트워크/환경변수 자동 적용)
+              sudo docker-compose pull
+              sudo docker-compose up -d
+          
+              # 5. 불필요한 이미지 정리
               sudo docker image prune -f
             "
