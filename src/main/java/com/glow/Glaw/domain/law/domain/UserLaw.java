@@ -1,5 +1,6 @@
 package com.glow.Glaw.domain.law.domain;
 
+import com.glow.Glaw.domain.shared.BaseTimeEntity;
 import com.glow.Glaw.domain.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "users_laws")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserLaw {
+public class UserLaw extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "bookmark_id")
