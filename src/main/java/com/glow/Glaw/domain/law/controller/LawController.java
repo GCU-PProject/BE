@@ -26,8 +26,11 @@ public class LawController {
 
 	// 법률 리스트 조회
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<LawListResponseDto>>> getLawList() {
-		List<LawListResponseDto> response = lawService.getLawList();
+	public ResponseEntity<ApiResponse<List<LawListResponseDto>>> getLawList(
+		@AuthenticationPrincipal CustomOAuth2User user
+	) {
+		Long userId = (user != null) ? user.getUserId() : null;
+		List<LawListResponseDto> response = lawService.getLawList(userId);
 
 		return ResponseEntity.ok(
 			ApiResponse.success("법률 리스트 조회 성공", response)
