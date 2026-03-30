@@ -13,4 +13,6 @@ public class LawListResponseDto {
 	private String lawTitle;
 	private String summary;
 	private LocalDateTime updatedAt;
+
+	private boolean isBookmarked;
 }

@@ -3,6 +3,7 @@ package com.glow.Glaw.domain.law.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.glow.Glaw.domain.law.dto.LawDetailResponseDto;
 import com.glow.Glaw.domain.law.dto.LawListResponseDto;
 import com.glow.Glaw.domain.law.service.LawService;
+import com.glow.Glaw.global.auth.login.domain.CustomOAuth2User;
 import com.glow.Glaw.global.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -47,11 +49,14 @@ public class LawController {
 	// 법률 검색
 	@GetMapping("/search")
 	public ResponseEntity<ApiResponse<List<LawListResponseDto>>> searchLaws(
+		@AuthenticationPrincipal CustomOAuth2User user,
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Long countryId,
 		@RequestParam(required = false) String lawType
 	){
-		List<LawListResponseDto> response = lawService.searchLaws(keyword, countryId, lawType);
+		Long userId = (user != null) ? user.getUserId() : null;
+
+		List<LawListResponseDto> response = lawService.searchLaws(userId, keyword, countryId, lawType);
 
 		return ResponseEntity.ok(
 			ApiResponse.success("법률 검색 성공", response)
