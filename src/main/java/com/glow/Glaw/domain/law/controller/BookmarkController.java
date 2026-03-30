@@ -1,13 +1,17 @@
 package com.glow.Glaw.domain.law.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.glow.Glaw.domain.law.dto.BookmarkResponseDto;
 import com.glow.Glaw.domain.law.service.BookmarkService;
 import com.glow.Glaw.global.auth.login.domain.CustomOAuth2User;
 import com.glow.Glaw.global.error.ErrorCode;
@@ -53,6 +57,22 @@ public class BookmarkController {
 
 		return ResponseEntity.ok(
 			ApiResponse.success("북마크 삭제 성공", null)
+		);
+	}
+
+	// 북마크 리스트 조회
+	@GetMapping
+	public ResponseEntity<ApiResponse<List<BookmarkResponseDto>>> getBookmarks(
+		@AuthenticationPrincipal CustomOAuth2User user
+	) {
+		if (user == null) {
+			throw new CommonException(ErrorCode.JWT_TOKEN_INVALID);
+		}
+
+		List<BookmarkResponseDto> response = bookmarkService.getBookmarks(user.getUserId());
+
+		return ResponseEntity.ok(
+			ApiResponse.success("북마크 조회 성공", response)
 		);
 	}
 }
