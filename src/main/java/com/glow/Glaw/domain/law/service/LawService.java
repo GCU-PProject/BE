@@ -61,4 +61,21 @@ public class LawService {
 			articles
 		);
 	}
+
+	// 법률 검색
+	public List<LawListResponseDto> searchLaws(String keyword, Long countryId, String lawType) {
+		List<Law> laws = lawRepository.searchLaws(keyword, countryId, lawType);
+
+		return laws.stream()
+			.map(law -> new LawListResponseDto(
+					law.getId(),
+					law.getCountry().getCountryName(),
+					law.getSectionTitle() != null ? law.getSectionTitle() : "제목 없음",
+					law.getContent() != null && law.getContent().length() > 100
+						? law.getContent().substring(0, 100) + ". . ."
+						: law.getContent(),
+					law.getUpdatedAt()
+			))
+			.toList();
+	}
 }
