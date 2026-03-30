@@ -32,7 +32,7 @@ public class BookmarkService {
 			.orElseThrow(() -> new CommonException(ErrorCode.USER_NOT_FOUND));
 
 		Law law = lawRepository.findById(lawId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NO_RESOURCE_FOUND));
+			.orElseThrow(() -> new CommonException(ErrorCode.LAW_NOT_FOUND));
 
 		userLawRepository.save(new UserLaw(user, law));
 	}

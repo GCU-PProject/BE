@@ -8,6 +8,8 @@ import com.glow.Glaw.domain.law.domain.Law;
 import com.glow.Glaw.domain.law.dto.LawDetailResponseDto;
 import com.glow.Glaw.domain.law.dto.LawListResponseDto;
 import com.glow.Glaw.domain.law.repository.LawRepository;
+import com.glow.Glaw.global.error.ErrorCode;
+import com.glow.Glaw.global.error.exception.CommonException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,7 +40,7 @@ public class LawService {
 		List<Law> laws = lawRepository.findAllBySameLaw(lawId);
 
 		if (laws.isEmpty()) {
-			throw new IllegalArgumentException("정보 조회 실패: 법률이 존재하지 않습니다.");
+			throw new CommonException(ErrorCode.LAW_NOT_FOUND);
 		}
 
 		Law first = laws.get(0);
