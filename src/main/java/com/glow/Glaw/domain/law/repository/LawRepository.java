@@ -21,4 +21,19 @@ public interface LawRepository extends JpaRepository<Law, Long> {
 		ORDER BY l.articleNo
 	""")
 	List<Law> findAllBySameLaw(Long lawId);
+
+	@Query("""
+		SELECT l FROM Law l
+		JOIN FETCH l.country
+		WHERE 
+			(:keyword IS NULL OR l.content LIKE %:keyword% OR l.sectionTitle LIKE %:keyword%)
+		AND (:countryId IS NULL OR l.country.id = :countryId)
+		AND (:lawType IS NULL OR l.lawType = :lawType)
+		ORDER BY l.updatedAt DESC
+	""")
+	List<Law> searchLaws(
+		String keyword,
+		Long countryId,
+		String lawType
+	);
 }
