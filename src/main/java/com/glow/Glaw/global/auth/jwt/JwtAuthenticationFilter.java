@@ -33,8 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		HttpServletResponse response,
 		FilterChain filterChain
 	) throws ServletException, IOException {
-		// 1) znzldptj AccessToken 추출
-		String token = extractTokenFromCookie(request);
+		// 1) 토큰 추출 (쿠키 우선, 없으면 헤더)
+		String token = extractToken(request);
 
 		if (token == null) {
 			filterChain.doFilter(request, response);
@@ -72,10 +72,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-		// 5) SecurityContext에 저장
+		// 4) SecurityContext에 저장
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		filterChain.doFilter(request, response);
+	}
+
+	// 토큰 추출 (쿠키 우선, 없으면 Authorization 헤더)
+	private String extractToken(HttpServletRequest request) {
+		// 1) 쿠키에서 추출 시도
+		String token = extractTokenFromCookie(request);
+		if (token != null) {
+			return token;
+		}
+
+		// 2) Authorization 헤더에서 추출 (Swagger 테스트용)
+		String authorization = request.getHeader("Authorization");
+		if (authorization != null && authorization.startsWith("Bearer ")) {
+			return authorization.substring(7);
+		}
+
+		return null;
 	}
 
 	private String extractTokenFromCookie(HttpServletRequest request) {
