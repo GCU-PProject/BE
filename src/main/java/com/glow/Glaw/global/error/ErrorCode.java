@@ -36,7 +36,10 @@ public enum ErrorCode {
 	// 온보딩
 	ONBOARDING_ALREADY_COMPLETED(400, "ONBOARDING_ALREADY_COMPLETED", "온보딩이 이미 완료되었습니다."),
 	ONBOARDING_COUNTRY_REQUIRED(400, "ONBOARDING_COUNTRY_REQUIRED", "국가를 한 개 이상 선택해야 합니다."),
-	COUNTRY_NOT_FOUND(404, "COUNTRY_NOT_FOUND", "존재하지 않는 국가입니다.");
+	COUNTRY_NOT_FOUND(404, "COUNTRY_NOT_FOUND", "존재하지 않는 국가입니다."),
+
+	// 법률 관련
+	LAW_NOT_FOUND(404, "LAW_NOT_FOUND", "법률을 찾을 수 없습니다.");
 
 	private final int status;
 	private final String code;
