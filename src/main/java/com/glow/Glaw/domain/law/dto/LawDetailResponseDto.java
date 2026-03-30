@@ -3,12 +3,13 @@ package com.glow.Glaw.domain.law.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
-public class RawDetailResponseDto {
+@AllArgsConstructor
+public class LawDetailResponseDto {
 	private Long lawId;
 	private String countryName;
 	private String lawType;
@@ -18,7 +19,7 @@ public class RawDetailResponseDto {
 	private List<ArticleDto> articles;
 
 	@Getter
-	@Builder
+	@AllArgsConstructor
 	public static class ArticleDto {
 		private String articleNo;
 		private String title;
