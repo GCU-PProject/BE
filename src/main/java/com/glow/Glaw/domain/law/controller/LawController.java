@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.glow.Glaw.domain.law.dto.LawDetailResponseDto;
@@ -40,6 +41,20 @@ public class LawController {
 
 		return ResponseEntity.ok(
 			ApiResponse.success("법률 상세 조회 성공", response)
+		);
+	}
+
+	// 법률 검색
+	@GetMapping("/search")
+	public ResponseEntity<ApiResponse<List<LawListResponseDto>>> searchLaws(
+		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) Long countryId,
+		@RequestParam(required = false) String lawType
+	){
+		List<LawListResponseDto> response = lawService.searchLaws(keyword, countryId, lawType);
+
+		return ResponseEntity.ok(
+			ApiResponse.success("법률 검색 성공", response)
 		);
 	}
 }
