@@ -1,10 +1,13 @@
 package com.glow.Glaw.domain.law.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.glow.Glaw.domain.law.domain.Law;
 import com.glow.Glaw.domain.law.domain.UserLaw;
+import com.glow.Glaw.domain.law.dto.BookmarkResponseDto;
 import com.glow.Glaw.domain.law.repository.LawRepository;
 import com.glow.Glaw.domain.law.repository.UserLawRepository;
 import com.glow.Glaw.domain.user.domain.User;
@@ -44,5 +47,18 @@ public class BookmarkService {
 		}
 
 		userLawRepository.deleteByUser_IdAndLaw_Id(userId, lawId);
+	}
+
+	// 북마크 리스트 조회
+	public List<BookmarkResponseDto> getBookmarks(Long userId) {
+		List<UserLaw> userLaws = userLawRepository.findAllByUserId(userId);
+
+		return userLaws.stream()
+			.map(ul -> new BookmarkResponseDto(
+					ul.getLaw().getId(),
+					ul.getLaw().getCountry().getCountryName(),
+					ul.getLaw().getSectionTitle()
+			))
+			.toList();
 	}
 }
