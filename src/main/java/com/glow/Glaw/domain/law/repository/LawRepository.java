@@ -11,4 +11,14 @@ public interface LawRepository extends JpaRepository<Law, Long> {
 	// N+1 방지 + 정렬
 	@Query("SELECT l FROM Law l JOIN FETCH l.country ORDER BY l.updatedAt DESC")
 	List<Law> findAllWithCountry();
+
+	@Query("""
+		SELECT l FROM Law l
+		JOIN FETCH l.country
+		WHERE l.sectionTitle = (
+			SELECT l2.sectionTitle FROM Law l2 WHERE l2.id = :lawId
+		)
+		ORDER BY l.articleNo
+	""")
+	List<Law> findAllBySameLaw(Long lawId);
 }
