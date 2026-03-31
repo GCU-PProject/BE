@@ -32,6 +32,11 @@ public class LawController {
 		Long userId = (user != null) ? user.getUserId() : null;
 		List<LawListResponseDto> response = lawService.getLawList(userId);
 
+		System.out.println("user = " + user);
+		if (user == null) {
+			System.out.println("user null 들어옴");
+		}
+
 		return ResponseEntity.ok(
 			ApiResponse.success("법률 리스트 조회 성공", response)
 		);
