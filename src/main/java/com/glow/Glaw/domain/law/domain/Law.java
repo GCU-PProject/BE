@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -42,8 +41,7 @@ public class Law extends BaseTimeEntity {
 	@Column(name = "article_no", nullable = false)
 	private String articleNo;
 
-	@Lob
-	@Column(name = "content", nullable = false)
+	@Column(name = "content", columnDefinition = "TEXT", nullable = false)
 	private String content;
 
 	@Column(name = "source_url")
