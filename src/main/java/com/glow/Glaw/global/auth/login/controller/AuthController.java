@@ -64,6 +64,7 @@ public class AuthController {
 		accessCookie.setDomain("glaw.site");
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
+		accessCookie.setAttribute("SameSite", "Lax");
 		response.addCookie(accessCookie);
 
 		log.info("New Access Token: {}", newAccessToken);
