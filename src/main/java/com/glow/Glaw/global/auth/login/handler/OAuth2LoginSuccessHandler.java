@@ -52,6 +52,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		accessCookie.setDomain("glaw.site");
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
+		accessCookie.setAttribute("SameSite", "Lax");
 		response.addCookie(accessCookie);
 
 		// 5) RefreshToken -> HttpOnly Cookie에 저장
@@ -61,6 +62,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		refreshCookie.setDomain("glaw.site");
 		refreshCookie.setPath("/");
 		refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
+		refreshCookie.setAttribute("SameSite", "Lax");
 		response.addCookie(refreshCookie);
 
 		// 6) 프론트로 최종 리다이렉트
