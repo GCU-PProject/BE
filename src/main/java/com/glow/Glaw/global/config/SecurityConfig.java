@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -17,6 +18,7 @@ import com.glow.Glaw.global.auth.handler.CustomAccessDeniedHandler;
 import com.glow.Glaw.global.auth.handler.CustomAuthenticationEntryPoint;
 import com.glow.Glaw.global.auth.jwt.JwtAuthenticationFilter;
 import com.glow.Glaw.global.auth.login.handler.OAuth2LoginSuccessHandler;
+import com.glow.Glaw.global.auth.login.resolver.CustomAuthorizationRequestResolver;
 import com.glow.Glaw.global.auth.login.service.CustomOAuth2UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class SecurityConfig {
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final ClientRegistrationRepository clientRegistrationRepository;
 
 	private final CustomAccessDeniedHandler customAccessDeniedHandler;
 	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -94,6 +97,11 @@ public class SecurityConfig {
 
 			// 3) OAuth2 Login 설정
 			.oauth2Login(oauth -> oauth
+				.authorizationEndpoint(authorization ->
+					authorization.authorizationRequestResolver(
+						new CustomAuthorizationRequestResolver(clientRegistrationRepository)
+					)
+				)
 				.userInfoEndpoint(userInfo ->
 					userInfo.userService(customOAuth2UserService)
 				)
