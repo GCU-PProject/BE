@@ -44,8 +44,11 @@ public class SecurityConfig {
 			"http://localhost:5173",
 			"http://localhost:8080",
 			"http://glaw.site",
+			"https://glaw.site",
 			"http://www.glaw.site",
-			"http://api.glaw.site"
+			"https://www.glaw.site",
+			"http://api.glaw.site",
+			"https://api.glaw.site"
 		));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));

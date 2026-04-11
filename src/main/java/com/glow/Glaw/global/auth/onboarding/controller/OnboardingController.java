@@ -16,6 +16,7 @@ import com.glow.Glaw.global.error.exception.CommonException;
 import com.glow.Glaw.global.response.ApiResponse;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +30,7 @@ public class OnboardingController {
 	public ResponseEntity<ApiResponse<Void>> onboarding(
 		@AuthenticationPrincipal CustomOAuth2User user,
 		@RequestBody OnboardingRequestDto onboardingRequestDto,
+		HttpServletRequest request,
 		HttpServletResponse response
 	) {
 		if (user == null) {
@@ -40,26 +42,41 @@ public class OnboardingController {
 			onboardingRequestDto
 		);
 
+		boolean isLocalhost = isLocalhostRequest(request);
+
 		// AccessToken -> HttpOnly Cookie에 저장
 		Cookie accessCookie = new Cookie("accessToken", tokens.getAccessToken());
 		accessCookie.setHttpOnly(true);
-		accessCookie.setSecure(false);
-		accessCookie.setDomain("glaw.site");
+		accessCookie.setSecure(true);
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
-		accessCookie.setAttribute("SameSite", "Lax");
+		if (isLocalhost) {
+			accessCookie.setAttribute("SameSite", "None");
+		}
+		if (!isLocalhost) {
+			accessCookie.setDomain("glaw.site");
+		}
 		response.addCookie(accessCookie);
 
 		// RefreshToken -> HttpOnly Cookie에 저장
 		Cookie refreshCookie = new Cookie("refreshToken", tokens.getRefreshToken());
 		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(false);
-		refreshCookie.setDomain("glaw.site");
+		refreshCookie.setSecure(true);
 		refreshCookie.setPath("/");
 		refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
-		refreshCookie.setAttribute("SameSite", "Lax");
+		if (isLocalhost) {
+			refreshCookie.setAttribute("SameSite", "None");
+		}
+		if (!isLocalhost) {
+			refreshCookie.setDomain("glaw.site");
+		}
 		response.addCookie(refreshCookie);
 
 		return ResponseEntity.ok(ApiResponse.success("온보딩 완료", null));
+	}
+
+	private boolean isLocalhostRequest(HttpServletRequest request) {
+		String origin = request.getHeader("Origin");
+		return origin != null && origin.contains("localhost");
 	}
 }

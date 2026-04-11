@@ -59,14 +59,18 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		// 5) 쿠키 도메인 결정
 		String domain = determineCookieDomain(redirectUrl);
+		boolean isLocalhost = domain.equals("localhost");
 
 		// 6) AccessToken -> HttpOnly Cookie에 저장
 		Cookie accessCookie = new Cookie("accessToken", accessToken);
 		accessCookie.setHttpOnly(true);
-		accessCookie.setSecure(false);
+		accessCookie.setSecure(true);
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
-		if (!domain.equals("localhost")) {
+		if (isLocalhost) {
+			accessCookie.setAttribute("SameSite", "None");
+		}
+		if (!isLocalhost) {
 			accessCookie.setDomain(domain);
 		}
 		response.addCookie(accessCookie);
@@ -74,10 +78,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// 7) RefreshToken -> HttpOnly Cookie에 저장
 		Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 		refreshCookie.setHttpOnly(true);
-		refreshCookie.setSecure(false);
+		refreshCookie.setSecure(true);
 		refreshCookie.setPath("/");
 		refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
-		if (!domain.equals("localhost")) {
+		if (isLocalhost) {
+			refreshCookie.setAttribute("SameSite", "None");
+		}
+		if (!isLocalhost) {
 			refreshCookie.setDomain(domain);
 		}
 		response.addCookie(refreshCookie);
