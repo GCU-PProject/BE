@@ -58,13 +58,19 @@ public class AuthController {
 		String newAccessToken = jwtProvider.createAccessToken(userId, email, name, role);
 
 		// 7) AccessToken -> HttpOnly Cookie에 저장
+		boolean isLocalhost = isLocalhostRequest(request);
+
 		Cookie accessCookie = new Cookie("accessToken", newAccessToken);
 		accessCookie.setHttpOnly(true);
-		accessCookie.setSecure(false);
-		accessCookie.setDomain("glaw.site");
+		accessCookie.setSecure(true);
 		accessCookie.setPath("/");
 		accessCookie.setMaxAge(60 * 60); // 1시간
-		accessCookie.setAttribute("SameSite", "Lax");
+		if (isLocalhost) {
+			accessCookie.setAttribute("SameSite", "None");
+		}
+		if (!isLocalhost) {
+			accessCookie.setDomain("glaw.site");
+		}
 		response.addCookie(accessCookie);
 
 		log.info("New Access Token: {}", newAccessToken);
@@ -88,8 +94,9 @@ public class AuthController {
 		}
 
 		// 4) 쿠키 삭제 (AccessToken + RefreshToken)
-		expireCookie(response, "accessToken");
-		expireCookie(response, "refreshToken");
+		boolean isLocalhost = isLocalhostRequest(request);
+		expireCookie(response, "accessToken", isLocalhost);
+		expireCookie(response, "refreshToken", isLocalhost);
 
 		log.info("로그아웃 완료");
 
@@ -97,12 +104,24 @@ public class AuthController {
 	}
 
 	// 쿠키 삭제
-	private void expireCookie(HttpServletResponse response, String name) {
+	private void expireCookie(HttpServletResponse response, String name, boolean isLocalhost) {
 		Cookie cookie = new Cookie(name, null);
 		cookie.setPath("/");
-		cookie.setDomain("glaw.site");
 		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
 		cookie.setMaxAge(0);
+		if (isLocalhost) {
+			cookie.setAttribute("SameSite", "None");
+		}
+		if (!isLocalhost) {
+			cookie.setDomain("glaw.site");
+		}
 		response.addCookie(cookie);
+	}
+
+	// Origin 헤더로 localhost 여부 판단
+	private boolean isLocalhostRequest(HttpServletRequest request) {
+		String origin = request.getHeader("Origin");
+		return origin != null && origin.contains("localhost");
 	}
 }

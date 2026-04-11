@@ -16,7 +16,7 @@ public class SwaggerConfig {
 	@Bean
 	public OpenAPI openAPI() {
 		io.swagger.v3.oas.models.servers.Server server = new io.swagger.v3.oas.models.servers.Server();
-		server.setUrl("http://api.glaw.site");
+		server.setUrl("https://api.glaw.site");
 
 		Info info = new Info()
 			.title("GLAW API Documentation")
