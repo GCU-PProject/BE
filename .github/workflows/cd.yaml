@@ -29,7 +29,6 @@ jobs:
 
           script_stop: true
           script: |
-            set -e
 
             echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin
 
