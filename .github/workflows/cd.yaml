@@ -36,7 +36,13 @@ jobs:
             ${{ secrets.YAML_COMPOSE }}
             EOF
 
+            sudo docker-compose -f ~/docker-compose.yml config
             sudo docker-compose -f ~/docker-compose.yml pull
-            sudo docker-compose -f ~/docker-compose.yml up -d
+
+            sudo docker-compose -f ~/docker-compose.yml down || true
+            sudo docker rm -f glaw-server redis || true
+
+            sudo docker-compose -f ~/docker-compose.yml up -d --force-recreate
+
             sudo docker image prune -f
-            sudo docker ps
+            sudo docker ps -a
