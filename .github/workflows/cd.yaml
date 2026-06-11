@@ -27,8 +27,8 @@ jobs:
           proxy_key: ${{ secrets.GCP_SSH_KEY }}
           proxy_port: 22
 
-          script_stop: true
           script: |
+            set -e
 
             echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin
 
