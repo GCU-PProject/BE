@@ -27,13 +27,17 @@ jobs:
           proxy_key: ${{ secrets.GCP_SSH_KEY }}
           proxy_port: 22
 
+          script_stop: true
           script: |
+            set -e
+
             echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin
 
             cat <<'EOF' > ~/docker-compose.yml
             ${{ secrets.YAML_COMPOSE }}
             EOF
 
-            sudo docker compose -f ~/docker-compose.yml pull
-            sudo docker compose -f ~/docker-compose.yml up -d
+            sudo docker-compose -f ~/docker-compose.yml pull
+            sudo docker-compose -f ~/docker-compose.yml up -d
             sudo docker image prune -f
+            sudo docker ps
