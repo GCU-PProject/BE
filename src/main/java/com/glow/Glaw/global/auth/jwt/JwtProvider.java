@@ -133,10 +133,10 @@ public class JwtProvider {
 
 	// 9. 쿠키에서 accessToken 추출
 	public Optional<String> extractAccessCookie(HttpServletRequest request) {
-		if (request.getCookies() != null) return Optional.empty();
+		if (request.getCookies() == null) return Optional.empty();
 
 		for (Cookie cookie : request.getCookies()) {
-			if (cookie.getName().equals("access-token")) {
+			if (cookie.getName().equals("accessToken")) {
 				return Optional.of(cookie.getValue());
 			}
 		}
