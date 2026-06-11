@@ -35,7 +35,7 @@ public class Law extends BaseTimeEntity {
 	@Column(name = "law_type", length = 20, nullable = false)
 	private String lawType;
 
-	@Column(name = "section_title")
+	@Column(name = "section_title", columnDefinition = "TEXT")
 	private String sectionTitle;
 
 	@Column(name = "article_no", nullable = false, columnDefinition = "TEXT")
