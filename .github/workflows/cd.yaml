@@ -14,29 +14,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Google Auth
-        uses: 'google-github-actions/auth@v2'
+      - name: SSH Deploy to Spring Server
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          host: ${{ secrets.SPRING_HOST }}
+          username: ${{ secrets.GCP_VM_USER }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          port: 22
 
-      - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+          proxy_host: ${{ secrets.BASTION_HOST }}
+          proxy_username: ${{ secrets.GCP_VM_USER }}
+          proxy_key: ${{ secrets.GCP_SSH_KEY }}
+          proxy_port: 22
 
-      - name: SSH Deploy
-        env:
-          # 1. 실행할 전체 스크립트를 환경 변수로 정의 (들여쓰기 걱정 NO!)
-          DEPLOY_SCRIPT: |
+          script: |
             echo '${{ secrets.DOCKER_PASSWORD }}' | sudo docker login -u '${{ secrets.DOCKER_USER_NAME }}' --password-stdin
+
             cat <<'EOF' > ~/docker-compose.yml
             ${{ secrets.YAML_COMPOSE }}
             EOF
-            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml pull
-            sudo /usr/local/bin/docker-compose -f ~/docker-compose.yml up -d
+
+            sudo docker compose -f ~/docker-compose.yml pull
+            sudo docker compose -f ~/docker-compose.yml up -d
             sudo docker image prune -f
-        run: |
-          # 2. 정의된 스크립트를 gcloud를 통해 서버로 전달
-          gcloud compute ssh ${{ secrets.GCP_VM_NAME }} \
-            --zone=${{ secrets.GCP_VM_ZONE }} \
-            --tunnel-through-iap \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="$DEPLOY_SCRIPT"
