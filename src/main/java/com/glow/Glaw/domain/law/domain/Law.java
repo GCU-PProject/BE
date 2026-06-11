@@ -44,7 +44,7 @@ public class Law extends BaseTimeEntity {
 	@Column(name = "content", columnDefinition = "TEXT", nullable = false)
 	private String content;
 
-	@Column(name = "source_url")
+	@Column(name = "source_url", columnDefinition = "TEXT")
 	private String sourceUrl;
 
 	@Column(name = "enactment_date")

@@ -80,6 +80,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.requestMatchers(
 					"/",
+					"/swagger",
 					"/oauth2/**",
 					"/api/auth/login",
 					"/swagger-ui/**",
